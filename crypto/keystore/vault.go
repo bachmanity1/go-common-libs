@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 	"github.com/sirupsen/logrus"
 
 	lhtypes "github.com/longhorn/go-common-libs/types"

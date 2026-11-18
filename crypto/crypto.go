@@ -291,10 +291,13 @@ func DeviceEncryptionStatus(devicePath string) (mappedDevice, mapper string, err
 		return devicePath, "", nil
 	}
 
-	lines := strings.Split(string(stdout), "\n")
-	if len(lines) < 1 {
-		return "", "", fmt.Errorf("device encryption status returned no stdout for %s", devicePath)
-	}
+	return parseDeviceEncryptionStatus(string(stdout), devicePath, volume)
+}
+
+// parseDeviceEncryptionStatus reads the device of the mapping out of a
+// `cryptsetup status` report.
+func parseDeviceEncryptionStatus(stdout, devicePath, volume string) (mappedDevice, mapper string, err error) {
+	lines := strings.Split(stdout, "\n")
 
 	// There are two possible cases for an encrypted mapper device:
 	// - "/path/to/device is active.": the mapper device is activated by `cryptsetup luksOpen`
@@ -306,11 +309,10 @@ func DeviceEncryptionStatus(devicePath string) (mappedDevice, mapper string, err
 
 	for i := 1; i < len(lines); i++ {
 		kv := strings.SplitN(strings.TrimSpace(lines[i]), ":", 2)
-		if len(kv) < 1 {
-			return "", "", fmt.Errorf("device encryption status output for %s is badly formatted: %s",
-				devicePath, lines[i])
+		if len(kv) < 2 {
+			continue
 		}
-		if strings.Compare(kv[0], "device") == 0 {
+		if strings.TrimSpace(kv[0]) == "device" {
 			return strings.TrimSpace(kv[1]), volume, nil
 		}
 	}

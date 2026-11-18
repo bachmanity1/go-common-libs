@@ -15,7 +15,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 
 	lhtypes "github.com/longhorn/go-common-libs/types"
 )
